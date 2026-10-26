@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+requests
+trafilatura
+tavily-python
+anthropic
+python-dotenv

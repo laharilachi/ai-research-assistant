@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Research Assistant | Deep RAG Knowledge Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+  <!-- Marked for markdown parsing & DOMPurify for sanitization -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Header / Navbar -->
+    <header class="navbar">
+      <div class="nav-brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+            <path d="M11 8v6"></path>
+            <path d="M8 11h6"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>AI Research Assistant</h1>
+          <span class="brand-tagline">Grounded Web RAG Agent</span>
+        </div>
+      </div>
+      <div class="nav-status">
+        <div id="statusBadge" class="status-pill status-connecting">
+          <span class="status-dot"></span>
+          <span id="statusText">Checking backend...</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-content">
+      <!-- Hero & Search Input Card -->
+      <section class="search-card">
+        <div class="card-header">
+          <h2>Synthesize In-Depth Research Reports</h2>
+          <p>Autonomous RAG pipeline: Query Planning &rarr; DuckDuckGo Search &rarr; Trafilatura Extraction &rarr; Source Summarization &rarr; Strictly Grounded Synthesis.</p>
+        </div>
+
+        <form id="researchForm" class="search-form">
+          <div class="input-wrapper">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input 
+              type="text" 
+              id="topicInput" 
+              placeholder="e.g., Breakthroughs in solid-state batteries and commercial viability in 2026..." 
+              required
+              autocomplete="off"
+            >
+            <button type="submit" id="startBtn" class="primary-btn">
+              <span class="btn-text">Start Research</span>
+              <svg class="arrow-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Suggested Topics -->
+          <div class="suggestions-row">
+            <span class="suggestions-label">Try:</span>
+            <button type="button" class="chip-btn" data-topic="Solid-state battery commercialization and bottlenecks">Solid-State Batteries</button>
+            <button type="button" class="chip-btn" data-topic="Quantum error correction developments and hardware milestones">Quantum Error Correction</button>
+            <button type="button" class="chip-btn" data-topic="Autonomous AI agents multi-agent architectures and benchmark evaluations">AI Agent Architectures</button>
+            <button type="button" class="chip-btn" data-topic="Nuclear fusion net energy gain progress and timeline">Nuclear Fusion Progress</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Progress Tracking Panel (Hidden initially) -->
+      <section id="progressSection" class="progress-panel hidden">
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <div class="spinner"></div>
+            <div>
+              <h3 id="currentStepTitle">Initiating Research Pipeline</h3>
+              <p id="currentStepMessage" class="step-subtext">Communicating with LLM agent...</p>
+            </div>
+          </div>
+          <span id="progressPercentage" class="percentage-label">0%</span>
+        </div>
+
+        <div class="progress-bar-container">
+          <div id="progressBar" class="progress-bar-fill" style="width: 0%;"></div>
+        </div>
+
+        <!-- Stepper Checklist -->
+        <div class="stepper-grid">
+          <div class="step-item" id="step-planning">
+            <div class="step-marker">1</div>
+            <div class="step-details">
+              <span class="step-name">Query Planning</span>
+              <span class="step-desc">Generating 4-6 targeted queries</span>
+            </div>
+          </div>
+          <div class="step-item" id="step-searching">
+            <div class="step-marker">2</div>
+            <div class="step-details">
+              <span class="step-name">Web Search</span>
+              <span class="step-desc">DuckDuckGo multi-query retrieval</span>
+            </div>
+          </div>
+          <div class="step-item" id="step-extracting">
+            <div class="step-marker">3</div>
+            <div class="step-details">
+              <span class="step-name">Content Extraction</span>
+              <span class="step-desc">Trafilatura clean text parsing</span>
+            </div>
+          </div>
+          <div class="step-item" id="step-summarizing">
+            <div class="step-marker">4</div>
+            <div class="step-details">
+              <span class="step-name">Source Summaries</span>
+              <span class="step-desc">Extracting factual evidence</span>
+            </div>
+          </div>
+          <div class="step-item" id="step-synthesizing">
+            <div class="step-marker">5</div>
+            <div class="step-details">
+              <span class="step-name">RAG Synthesis</span>
+              <span class="step-desc">Report generation with citations</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Queries Preview Container -->
+        <div id="queriesPreview" class="queries-preview hidden">
+          <h4>Generated Search Queries:</h4>
+          <div id="queriesTags" class="tags-container"></div>
+        </div>
+      </section>
+
+      <!-- Error Box -->
+      <div id="errorBox" class="alert-box alert-error hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span id="errorMessage">An error occurred while conducting research.</span>
+      </div>
+
+      <!-- Report & Results Section (Hidden initially) -->
+      <section id="resultSection" class="result-section hidden">
+        <div class="report-toolbar">
+          <div class="meta-info">
+            <span class="badge" id="reportModelBadge">Model</span>
+            <span class="badge badge-light" id="reportSourcesCountBadge">0 Sources</span>
+          </div>
+          <div class="toolbar-actions">
+            <button id="copyBtn" class="action-btn" title="Copy Markdown">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span>Copy</span>
+            </button>
+            <button id="downloadBtn" class="action-btn action-primary" title="Download Markdown file">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Download (.md)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab Controls -->
+        <div class="view-tabs">
+          <button class="tab-btn active" data-tab="reportView">Research Report</button>
+          <button class="tab-btn" data-tab="sourcesView">Retrieved Sources & Evidence (<span id="sourceTabCount">0</span>)</button>
+        </div>
+
+        <!-- Tab 1: Rendered Report View -->
+        <div id="reportView" class="tab-panel active">
+          <article id="reportContent" class="markdown-article"></article>
+        </div>
+
+        <!-- Tab 2: Sources & Evidence View -->
+        <div id="sourcesView" class="tab-panel hidden">
+          <div id="sourcesGrid" class="sources-grid"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>AI Research Assistant &bull; Powered by FastAPI &bull; LangChain &bull; DuckDuckGo Search &bull; Trafilatura</p>
+    </footer>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
